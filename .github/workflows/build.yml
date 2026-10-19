@@ -1,0 +1,41 @@
+name: Build QDON ENLITE UI dylib (arm64)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build UI-only iOS dylib
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcrun --sdk iphoneos clang \
+            -arch arm64 \
+            -isysroot "$(xcrun --sdk iphoneos --show-sdk-path)" \
+            -miphoneos-version-min=15.0 \
+            -fobjc-arc \
+            -dynamiclib \
+            -framework UIKit \
+            -framework Foundation \
+            Sources/QDONENLITE.m \
+            -o libQDONENLITE.dylib
+
+      - name: Package artifact
+        run: |
+          mkdir -p output
+          cp libQDONENLITE.dylib output/
+          cp README_VI.md output/ 2>/dev/null || true
+          cd output && zip -r ../QDON_ENLITE_iOS_UI_dylib.zip .
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: QDON-ENLITE-iOS-UI-dylib
+          path: |
+            libQDONENLITE.dylib
+            QDON_ENLITE_iOS_UI_dylib.zip
