@@ -22,6 +22,7 @@ jobs:
             -dynamiclib \
             -framework UIKit \
             -framework Foundation \
+            -framework CoreGraphics \
             Sources/QDONENLITE.m \
             -o libQDONENLITE.dylib
 
